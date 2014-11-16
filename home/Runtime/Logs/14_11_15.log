@@ -1,0 +1,5 @@
+[ 2014-11-15T12:12:05+08:00 ] ERR: (ThinkException) 非法操作:getProduct
+[ 2014-11-15T13:54:09+08:00 ] ERR: (ThinkException) 非法操作:getProduct
+[ 2014-11-15T20:37:53+08:00 ] ERR: (ThinkException) 非法操作:__PUBLIC__
+[ 2014-11-15T22:37:17+08:00 ] ERR: (ThinkException) 无法加载模块:Index
+[ 2014-11-15T23:26:46+08:00 ] ERR: (ThinkException) 非法操作:index

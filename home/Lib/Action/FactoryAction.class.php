@@ -6,6 +6,7 @@ class FactoryAction extends Action {
      * [get]
      */
 	public function getAllProduct(){
+		
 		header("Access-Control-Allow-Origin: *");
 		$key = !empty($_GET['key']) ? $_GET['key'].' ' : null;	//排序的字段
 		$order = !empty($_GET['order']) && !empty($key) ? $key.$_GET['order'] : null;	//将字段以及排序的方式组合起来
@@ -31,7 +32,7 @@ class FactoryAction extends Action {
      * [post]
      * @param  id: json格式(如：["12","13"])
      */
-    /* public function delProduct(){
+    public function delProduct(){
 	    if( $_POST['id'] != null && $_POST['id'] != '' ){
 	    	$ids = json_decode($_POST['id'],true);
 			if( M('Product_info')->where(array('id'=>array('in',$ids)))->delete() )
@@ -42,27 +43,8 @@ class FactoryAction extends Action {
 	    else{
 	    	$this->ajaxReturn( 0,'没有指定删除的商品ID',0 );
 	    }
-    } */
-    
-    /**
-     * 删除产品信息
-     * [get]
-     */
-    public function delProduct(){
-    	
-    	if(isset($_GET['id']) && $_GET['id'] != ''){
-    		$ret = M('Product_info')->where('id='.$_GET['id'])->delete();
-    		if($ret){
-    			$this->ajaxReturn(0, '删除成功', 1);
-    		}else{
-    			$this->ajaxReturn(0, '删除失败', 0);
-    		}
-    	}else{
-    		$this->ajaxReturn(0,'没有指定删除的商品ID',0);
-    	}   	
-    }
- 
-    
+    } 
+   
     /**
      * 增加或者修改产品信息
      */
@@ -118,12 +100,13 @@ class FactoryAction extends Action {
      * 实现post数据自动验证，自动完成插入或者修改
      * @param  $model 模型名
      * @param  $returnInfo 错误或成功返回的信息
-     * @param  返回新增或者修改时是否直接输出还是返回，默认不返回
+     * @param  $return 返回新增或者修改时是否直接输出还是返回，默认不返回
      */
     public function addOrEdit($model,$returnInfo,$return=FALSE){
     	$ret = D($model);
-    
-    	if(!isset($_POST['id']) || $_POST['id'] == ''){
+    	
+    	if( !isset($_POST['id']) || $_POST['id'] == '' ){
+			
     		if( !$ret->create() ){
     			if($return)	return false;
     			$this->ajaxReturn(0, $ret->getError(), 0);
@@ -174,8 +157,50 @@ class FactoryAction extends Action {
     /**
      * 新增分销商
      */
-    public function addDistribution(){
+    public function editDistributorInfo(){
+    	//新增分销商信息
+    	if($_POST['id'] == '' || !isset($_POST['id'])){
+    		$_POST['username'] = $_POST['password'] = 'user'.time();	//默认时间戳
+    		$_POST['status'] = '1';	  //厂家新增分销商默认审核通过
+    	}
+   		//修改分销商信息
+   		$this->addOrEdit('Distributor_info', '分销商');
     	
+    }
+    
+    /**
+     * 获取所有分销商
+     * [get]
+     * @param $status： 是否审核通过（可选）    
+     * 				值：0（未审核） 1（审核通过） null（所有）
+     */
+    public function getAllDistributor(){
+    	$where = array();
+    	if(!isset($_POST['status']))	//没有status参数说明要获取所有的分销商（包括未审核以及已经审核通过的）
+    		$where = null;
+    	else 
+    		$where['status'] = $_POST['status'];	//获取指定未审核的或者已经审核的
+    	
+    	$ret = M('Distributor_info')->where($where)->select();
+    	$this->ajaxReturn($ret,'获取所有分销商信息成功！',1);
+    }
+    
+    /**
+     * 获取厂家信息
+     */
+    public function getFactoryInfo(){
+    	$ret = M('factory_info')->select();
+    	$this->ajaxReturn($ret,"获取厂家信息成功",1);
+    }
+    
+    /**
+     * 修改厂家信息
+     */
+    public function editFactoryInfo(){
+    	if($_POST['id'] == '' || !isset($_POST['id'])){
+    		$this->ajaxReturn(0, '数据有误，请正确填写！', 0);
+    	}
+    	$this->addOrEdit('Factory_info', '厂家信息');
     }
     
     /**

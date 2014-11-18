@@ -7,11 +7,10 @@ class FactoryAction extends Action {
      */
 	public function getAllProduct(){
 		
-		header("Access-Control-Allow-Origin: *");
 		$key = !empty($_GET['key']) ? $_GET['key'].' ' : null;	//排序的字段
 		$order = !empty($_GET['order']) && !empty($key) ? $key.$_GET['order'] : null;	//将字段以及排序的方式组合起来
 	
-		$ret = M('Product_info')->order( $order )->select();
+		$ret = D('Product_info')->relation('specImage')->order( $order )->select();
 		
 		$this->ajaxReturn($ret,"获取成功",1);
     }
@@ -23,7 +22,7 @@ class FactoryAction extends Action {
     public function getProductDetail(){
     	if(!isset($_GET['id']) || $_GET['id'] == '')
     		$this->ajaxReturn(0, '没有指定商品ID', 0);
-    	$ret = D('Product_info')->relation('spec_image')->find($_GET['id']);
+    	$ret = D('Product_info')->relation('specImage')->find($_GET['id']);
     	$this->ajaxReturn($ret, '获取成功', 1);
     }
     
@@ -176,10 +175,10 @@ class FactoryAction extends Action {
      */
     public function getAllDistributor(){
     	$where = array();
-    	if(!isset($_POST['status']))	//没有status参数说明要获取所有的分销商（包括未审核以及已经审核通过的）
+    	if(!isset($_GET['status']))	//没有status参数说明要获取所有的分销商（包括未审核以及已经审核通过的）
     		$where = null;
     	else 
-    		$where['status'] = $_POST['status'];	//获取指定未审核的或者已经审核的
+    		$where['status'] = $_GET['status'];	//获取指定未审核的或者已经审核的
     	
     	$ret = M('Distributor_info')->where($where)->select();
     	$this->ajaxReturn($ret,'获取所有分销商信息成功！',1);
@@ -204,6 +203,34 @@ class FactoryAction extends Action {
     }
     
     /**
+     * 获取所有的订单
+     */
+    public function getAllOrder(){
+    	$ret = D('Order_list')->relation(array('distributorInfo','customInfo'))->select();
+    	$this->ajaxReturn($ret,'获取订单成功',1);
+    }
+    
+    /**
+     * 增加或者修改订单信息
+     */
+    public function editOrder(){
+    		
+    }
+    
+    /**
+     *	获取所有分销商的业绩(包括总销售价钱、总销售数量)
+     */
+    public function getDistributorSale(){
+    	
+    	if($_POST['start'] != '' && isset($_POST['start']) && $_POST['end'] != '' && isset($_POST['end'])){
+    		$map['cTime'] = array('between',array($_POST['start'],$_POST['end']));
+    	}
+    	$map['status'] = array('gt',1);	//说明订单已经付款或者选择货到付款
+    	$ret = D('Order_list')->relation('distributorInfo')->field('SUM(total_price) sale_price,SUM(amount) sale_amount,distributor_id')->where($map)->group('distributor_id')->select();
+    	$this->ajaxReturn($ret,'获取分销商业绩成功',1);
+    }
+    
+    /**
      * 上传
      */
     Public function upload($maxSize="3145728", $allowExts=array('bmp','jpg','jpeg','png','gif'),$savePath="./Public/Uploads/",$uploadReplace=true){
@@ -221,4 +248,5 @@ class FactoryAction extends Action {
     		return $result;
     	}
     }
+    
 }

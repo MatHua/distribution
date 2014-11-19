@@ -3,15 +3,43 @@
 class FactoryAction extends Action {
     /**
      * 获取所有的商品列表
-     * [get]
+     * [POST]
+     * @param $key（可选） : 排序的字段
+     * @param $order （可选）: 升序或者降序
+     * 
+     * @param $page（可选） ： 第几页
+     * @param $page_size（可选）：每页显示数
+     * 
+     * @param $keyword（可选）：关键字 
      */
 	public function getAllProduct(){
 		
-		$key = !empty($_GET['key']) ? $_GET['key'].' ' : null;	//排序的字段
-		$order = !empty($_GET['order']) && !empty($key) ? $key.$_GET['order'] : null;	//将字段以及排序的方式组合起来
-	
-		$ret = D('Product_info')->relation('specImage')->order( $order )->select();
+		$order = $limit = $where = null;
+		$page = 0;   //是否分页
+		//组合字段升降序order
+		if( isset($_POST['key']) && $_POST['key'] != '' && isset($_POST['order']) && $_POST['order'] != '' ){
+			$order = $_POST['key'].' '.$_POST['order'];
+		}
+	    
+		//搜索关键字
+		if( isset($_POST['keyword']) && $_POST['keyword'] != ''){
+			$where['id'] = array('like','%'.$_POST['keyword'].'%');
+			$where['name'] = array('like','%'.$_POST['keyword'].'%');
+		}
 		
+		//组合显示条数limit
+		if( isset($_POST['current_page']) && $_POST['current_page'] != '' && isset($_POST['page_size']) && $_POST['page_size'] != '' ){
+			$limit = ($_POST['current_page']-1)*$_POST['page_size'].','.$_POST['page_size'];
+			$page = 1;
+		}
+		
+		$ret1 = D('Product_info')->relation('specImage')->where( $where )->order( $order )->select();
+		$ret = D('Product_info')->relation('specImage')->where( $where )->order( $order )->limit( $limit )->select();
+	
+		//获取页数
+		if($page)		$ret['page_amount'] = ceil(count($ret1)/$_POST['page_size']);
+		else 			$ret['page_amount'] = 1;
+ 		
 		$this->ajaxReturn($ret,"获取成功",1);
     }
     
@@ -204,9 +232,17 @@ class FactoryAction extends Action {
     
     /**
      * 获取所有的订单
+     * [get]
+     * @param status : 订单的状态
+     * 			值	   ：  0：失败、1：未付款、2：已付款、3：货到付款、4：配送中、5：成功
      */
     public function getAllOrder(){
-    	$ret = D('Order_list')->relation(array('distributorInfo','customInfo'))->select();
+    	$map = array();
+    	if(!isset($_GET['status']))	//没有status参数说明要获取所有的分销商（包括未审核以及已经审核通过的）
+    		$map = null;
+    	else
+    		$map['status'] = $_GET['status'];	//获取指定未审核的或者已经审核的
+    	$ret = D('Order_list')->relation(array('distributorInfo','customInfo'))->where($map)->select();
     	$this->ajaxReturn($ret,'获取订单成功',1);
     }
     
@@ -218,16 +254,82 @@ class FactoryAction extends Action {
     }
     
     /**
-     *	获取所有分销商的业绩(包括总销售价钱、总销售数量)
+     *	获取某个时间段总体销售额业绩
+     *  [post]
+     *  @param $unit : 统计单位
+     *  		       值    ： month（月）、day（天）
+     *  @param $start  : 选择查询开始日期(2014-09、2014-09-10)
+     *  @param $end    : 选择查询结束日期
+     */
+    public function getAllSale(){
+    	
+    	if(($_POST['unit'] != 'day' && $_POST['unit'] != 'month') || $_POST['start'] == '' || !isset($_POST['start']) || $_POST['end'] == '' || !isset($_POST['end'])){
+    		$this->ajaxReturn(0, '参数不正确', 0);
+    	}
+    	
+    	$map['confirm'] = array('eq',1);	//订单厂家已经确认
+    	$map['cTime'] = array('between',array(strtotime($_POST['start']),strtotime($_POST['end'])+86400));
+    	
+    	if($_POST['unit'] == 'day'){		//以周为单位
+    		$ret = D('Order_list')->field('SUM(total_price) sale_price,FROM_UNIXTIME(cTime, "%Y-%m-%d") day')->where($map)->order('sale_price desc')->group('day')->select();
+    	}else{		//以月为单位
+    		$ret = D('Order_list')->field('SUM(total_price) sale_price,FROM_UNIXTIME(cTime, "%Y-%m") month')->where($map)->order('sale_price desc')->group('month')->select();
+    	}
+    	  	
+    	$this->ajaxReturn($ret,'获取总销售额业绩成功',1);
+    }
+    
+    /**
+     * 获取各个商品某个时间段的总销售额和件数(月业绩、日业绩)
+     *  [post]
+     *  
+     *  @param $start  : 选择查询开始日期(2014-09、2014-09-10)
+     *  @param $end    : 选择查询结束日期
+     */
+    public function getProductSale(){
+    	if( $_POST['start'] == '' || !isset($_POST['start']) || $_POST['end'] == '' || !isset($_POST['end'])){
+    		$this->ajaxReturn(0, '参数不正确', 0);
+    	}
+   
+    	$map['confirm'] = array('eq',1);	//订单厂家已经确认
+    	$map['cTime'] = array('between',array(strtotime($_POST['start']),strtotime($_POST['end'])+86400));
+    	 
+  		$ret = D('Order_list')->relation('productInfo')->field('SUM(total_price) sale_price,SUM(amount) sale_amount,product_id')->where($map)->order('sale_amount desc')->group('product_id')->select();
+    	
+    	$this->ajaxReturn($ret,'各个商品的总销售情况成功',1);
+    }
+    
+    /**
+     *	获取某个商品   各个分销商的总销售额以及总销售件数 
+     *  获取各个分销商的总销售情况
+     *	[post]
+     *  @param $product_id（可选） : 商品的ID
+     *  @param $start  : 选择查询开始日期(2014-09、2014-09-10)
+     *  @param $end    : 选择查询结束日期
      */
     public function getDistributorSale(){
-    	
-    	if($_POST['start'] != '' && isset($_POST['start']) && $_POST['end'] != '' && isset($_POST['end'])){
-    		$map['cTime'] = array('between',array($_POST['start'],$_POST['end']));
+    	if( $_POST['start'] == '' || !isset($_POST['start']) || $_POST['end'] == '' || !isset($_POST['end'])){
+    		$this->ajaxReturn(0, '参数不正确', 0);
     	}
-    	$map['status'] = array('gt',1);	//说明订单已经付款或者选择货到付款
-    	$ret = D('Order_list')->relation('distributorInfo')->field('SUM(total_price) sale_price,SUM(amount) sale_amount,distributor_id')->where($map)->group('distributor_id')->select();
-    	$this->ajaxReturn($ret,'获取分销商业绩成功',1);
+    	
+    	//获取某商品在各个分销商的总销售额以及销售件数
+    	if( $_POST['product_id'] != '' && isset($_POST['product_id']) ){
+    		$map['product_id'] = $_POST['product_id'];
+    		$map['confirm'] = array('eq',1);	//订单厂家已经确认
+    		$map['cTime'] = array('between',array(strtotime($_POST['start']),strtotime($_POST['end'])+86400));
+    		
+    		$ret = D('Order_list')->relation(array('distributorInfo','productInfo'))->field('SUM(total_price) sale_price,SUM(amount) sale_amount,distributor_id,product_id')->where($map)->order('sale_amount desc')->group('distributor_id')->select();
+    		$this->ajaxReturn($ret,'获取该商品在各个分销商的销售情况成功',1);
+    	}
+    	
+    	//获取各个分销商的总销售情况
+    	$map['confirm'] = array('eq',1);	//订单厂家已经确认
+    	$map['cTime'] = array('between',array(strtotime($_POST['start']),strtotime($_POST['end'])+86400));
+    	
+    	$ret = D('Order_list')->relation('distributorInfo')->field('SUM(total_price) sale_price,distributor_id')->where($map)->group('distributor_id')->order('sale_price desc')->select();
+    		 
+    	$this->ajaxReturn($ret,'获取各个分销商的销售情况成功',1);
+    	
     }
     
     /**

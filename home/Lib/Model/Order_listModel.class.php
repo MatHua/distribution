@@ -26,6 +26,13 @@ class Order_listModel extends RelationModel{
 					'mapping_fields'=>'truename,phone',
 					'as_fields'=>'truename:custom_name,phone:custom_phone',
 			),
+			'productInfo'=> array(
+					'mapping_type'=>BELONGS_TO,
+					'class_name'=>'Product_info',
+					'foreign_key'=>'product_id',
+					'mapping_fields'=>'name,salesman_price,distributor_price,cost_price',
+					'as_fields'=>'name:product_name',
+			),
 	
 	);
 	

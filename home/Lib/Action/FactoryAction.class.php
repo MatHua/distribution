@@ -234,7 +234,7 @@ class FactoryAction extends Action {
      * 获取所有的订单
      * [get]
      * @param status : 订单的状态
-     * 			值	   ：  0：失败、1：未付款、2：已付款、3：货到付款、4：配送中、5：成功
+     * 			值	   ：  0：已下单、1：未付款、2：已付款、3：货到付款、4：配送中、5：成功
      */
     public function getAllOrder(){
     	$map = array();
@@ -251,6 +251,23 @@ class FactoryAction extends Action {
      */
     public function editOrder(){
     		
+    }
+    
+    /**
+     * 删除订单
+     * [get]
+     * @param $id : 订单ID
+     */
+    public function delOrder(){
+    	if ($_POST['id'] == '' || !isset($_POST['id'])) {
+    		$this->ajaxReturn(0,'参数不正确',0);
+    	}
+    	$ids = json_decode($_POST['id'],true);
+    	$ret = M('Order_list')->where(array('id'=>array('in',$ids)))->delete();
+    	if( $ret )
+	    	$this->ajaxReturn( 0,'删除成功',1 );
+	    else
+	    	$this->ajaxReturn( 0,'删除失败',0 );
     }
     
     /**

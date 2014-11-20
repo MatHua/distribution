@@ -11,6 +11,8 @@ class FactoryAction extends Action {
      * @param $page_size（可选）：每页显示数
      * 
      * @param $keyword（可选）：关键字 
+     * 
+     * @param $onSale（可选） ：  是否上架
      */
 	public function getAllProduct(){
 		
@@ -33,13 +35,18 @@ class FactoryAction extends Action {
 			$page = 1;
 		}
 		
-		$ret1 = D('Product_info')->relation('specImage')->where( $where )->order( $order )->select();
+		if( isset($_POST['onSale']) && $_POST['onSale'] != ''){
+			$where['status'] = $_POST['onSale'];
+		}
+		
+		$amount = D('Product_info')->where( $where )->getField('count(id) amount');
 		$ret = D('Product_info')->relation('specImage')->where( $where )->order( $order )->limit( $limit )->select();
-	
+		
 		//获取页数
-		if($page)		$ret['page_amount'] = ceil(count($ret1)/$_POST['page_size']);
-		else 			$ret['page_amount'] = 1;
- 		
+	 	if($page)			$ret['page_amount'] = ceil($amount/$_POST['page_size']);	//有符合条件的商品,分页
+		else if($amount)	$ret['page_amount'] = 1;	//有符合条件的商品,但不分页
+		else				$ret['page_amount'] = 0;	//没有符合条件的商品 
+
 		$this->ajaxReturn($ret,"获取成功",1);
     }
     

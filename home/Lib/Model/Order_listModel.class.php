@@ -37,7 +37,7 @@ class Order_listModel extends RelationModel{
 	);
 	
 	protected $_validate=array(		
-			
+		//	array('','require','厂家负责人必须填写!',1,'regex',1),
 	);
 	
 }

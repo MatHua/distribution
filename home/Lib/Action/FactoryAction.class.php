@@ -27,6 +27,7 @@ class FactoryAction extends Action {
 		if( isset($_POST['keyword']) && $_POST['keyword'] != ''){
 			$where['id'] = array('like','%'.$_POST['keyword'].'%');
 			$where['name'] = array('like','%'.$_POST['keyword'].'%');
+			$where['_logic'] = 'or';
 		}
 		
 		//组合显示条数limit
@@ -245,12 +246,24 @@ class FactoryAction extends Action {
      */
     public function getAllOrder(){
     	$map = array();
-    	if(!isset($_GET['status']))	//没有status参数说明要获取所有的分销商（包括未审核以及已经审核通过的）
+    	if(!isset($_GET['status']) || $_GET['status'] == '')
     		$map = null;
     	else
-    		$map['status'] = $_GET['status'];	//获取指定未审核的或者已经审核的
-    	$ret = D('Order_list')->relation(array('distributorInfo','customInfo'))->where($map)->select();
+    		$map['status'] = $_GET['status'];
+    	$ret = D('Order_list')->relation(array('distributorInfo','customInfo'))->where($map)->group('order_id')->select();
+    	dump($ret);exit;
     	$this->ajaxReturn($ret,'获取订单成功',1);
+    }
+    
+    /**
+     * 获取指定订单ID的详细信息【待定】
+     * [get]
+     */
+    private function getOrderDetail(){			
+    	if(!isset($_GET['id']) || $_GET['id'] == '')
+    		$this->ajaxReturn(0, '没有指定商品ID', 0);
+    	$ret = D('Order_info')->relation('distributorInfo')->find($_GET['id']);
+    	$this->ajaxReturn($ret, '获取成功', 1);
     }
     
     /**

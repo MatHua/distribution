@@ -7,7 +7,7 @@ class FactoryAction extends Action {
      * @param $key（可选） : 排序的字段
      * @param $order （可选）: 升序或者降序
      * 
-     * @param $page（可选） ： 第几页
+     * @param $current_page（可选） ： 第几页
      * @param $page_size（可选）：每页显示数
      * 
      * @param $keyword（可选）：关键字 
@@ -30,7 +30,7 @@ class FactoryAction extends Action {
 			$where['_logic'] = 'or';
 		}
 		
-		//组合显示条数limit
+		//组合显示条数limit,分页
 		if( isset($_POST['current_page']) && $_POST['current_page'] != '' && isset($_POST['page_size']) && $_POST['page_size'] != '' ){
 			$limit = ($_POST['current_page']-1)*$_POST['page_size'].','.$_POST['page_size'];
 			$page = 1;
@@ -94,7 +94,7 @@ class FactoryAction extends Action {
 	 	$specImage = $jsonArr['specImage'];
 	 	
     	//增加商品基础信息以及规格照片
-    	if(!isset($productInfo['id']) || $productInfo['id'] == ''){		
+    	if((!isset($productInfo['id']) || $productInfo['id'] == '') && (!isset($specImage[0]['id']) || $specImage[0]['id'] == '')  ){		
     		$lastId = M('Product_info')->add($productInfo);
     		if($lastId){
     			foreach ($specImage as $vo){
@@ -240,30 +240,81 @@ class FactoryAction extends Action {
     
     /**
      * 获取所有的订单
-     * [get]
+     * [post]
      * @param status : 订单的状态
      * 			值	   ：  0：已下单、1：未付款、2：已付款、3：货到付款、4：配送中、5：成功
+     * 
+     * @param $key（可选） : 排序的字段
+     * @param $order （可选）: 升序或者降序
+     * 
+     * @param $current_page（可选） ： 第几页
+     * @param $page_size（可选）：每页显示数
+     * 
+     * @param $keyword（可选）：关键字 
+     * 
      */
     public function getAllOrder(){
-    	$map = array();
-    	if(!isset($_GET['status']) || $_GET['status'] == '')
-    		$map = null;
-    	else
-    		$map['status'] = $_GET['status'];
-    	$ret = D('Order_list')->relation(array('distributorInfo','customInfo'))->where($map)->group('order_id')->select();
-    	dump($ret);exit;
-    	$this->ajaxReturn($ret,'获取订单成功',1);
+    	
+    	$order = $limit = $where = null;
+    	$page = 0;   //是否分页
+    	
+    	//组合字段升降序order
+    	if( isset($_POST['key']) && $_POST['key'] != '' && isset($_POST['order']) && $_POST['order'] != '' ){
+    		$order = $_POST['key'].' '.$_POST['order'];
+    	}
+    	 
+    	//搜索关键字
+    	if( isset($_POST['keyword']) && $_POST['keyword'] != ''){
+    		$where['order_id'] = array('like','%'.$_POST['keyword'].'%');
+    //		$where['_logic'] = 'or';
+    	}
+    	
+    	//组合显示条数limit,分页
+    	if( isset($_POST['current_page']) && $_POST['current_page'] != '' && isset($_POST['page_size']) && $_POST['page_size'] != '' ){
+    		$offset = ($_POST['current_page']-1)*$_POST['page_size'];
+    		$length = $_POST['page_size'];
+    		$page = 1;
+    	}
+    	
+    	if( isset($_POST['status']) && $_POST['status'] != ''){
+    		$where['status'] = $_POST['status'];
+    	}
+    	
+    	$ret = D('Order_list')->relation(array('distributorInfo','customInfo','productInfo'))->where($where)->order( $order )->limit($limit)->select();
+    	
+    	$arr = array();
+    	foreach ($ret as $key => $value){
+    		$orderId = $value['order_id'];
+    		$arr[$orderId][] = $value;
+    	}
+    	$data = array_slice($arr,$offset,$length,true);
+    	
+    	//获取页数
+    	if($page)			$data['page_amount'] = ceil(count($arr)/$_POST['page_size']);	//有符合条件的商品,分页
+    	else if(count($arr))	$data['page_amount'] = 1;	//有符合条件的商品,但不分页
+    	else				$data['page_amount'] = 0;	//没有符合条件的商品
+    	   
+    	$this->ajaxReturn($data,'获取订单数据成功',1);
     }
     
     /**
-     * 获取指定订单ID的详细信息【待定】
+     * 获取指定订单ID的详细信息
      * [get]
+     * @param $order_id 订单ID
      */
-    private function getOrderDetail(){			
-    	if(!isset($_GET['id']) || $_GET['id'] == '')
-    		$this->ajaxReturn(0, '没有指定商品ID', 0);
-    	$ret = D('Order_info')->relation('distributorInfo')->find($_GET['id']);
-    	$this->ajaxReturn($ret, '获取成功', 1);
+    public function getOrderDetail(){			
+    	if(!isset($_GET['order_id']) || $_GET['order_id'] == '')
+    		$this->ajaxReturn(0, '没有指定订单ID', 0);
+    	$where['order_id'] = $_GET['order_id'];
+    	$ret = D('Order_list')->relation(array('distributorInfo','customInfo','productInfo','specImage'))->where($where)->select();
+    	
+    	$arr = array();
+    	foreach ($ret as $key => $value){
+    		$orderId = $value['order_id'];
+    		$arr[$orderId][] = $value;
+    	}
+    	
+    	$this->ajaxReturn($arr, '获取成功', 1);
     }
     
     /**

@@ -39,10 +39,40 @@
 	 specImage[1]['spec_2'] ="11寸";
 	 specImage[1]['image_1'] = "324242.png"; */
 	
-	 var data = '{"productInfo":{"id":"13","name":"\u5546\u54c113","model":"\u8d3a\u5361","introduction":"\u63cf\u8ff0","cost_price":"10","distribution_price":"12","salesman_price":"20","producer":"\u67d0\u5730","has_sale":"10","left":"0","status":"1"},"specImage":[{"id":"19","spec_1":"\u84dd\u8272","spec_2":"10\u5bf8","image_1":"42422223.png"},{"id":"20","spec_1":"\u9ed1\u8272","spec_2":"11\u5bf8","image_1":"43245532.png"}]}';
-    $.post("http://3.xiong607.sinaapp.com/index.php/Factory/getAllProduct",
+	 var data = '{
+		    "productInfo": {
+		        "id": "11",
+		        "name": "商品11",
+		        "model": "贺卡",
+		        "introduction": "描述",
+		        "cost_price": "10",
+		        "distribution_price": "12",
+		        "salesman_price": "20",
+		        "producer": "某地",
+		        "has_sale": "10",
+		        "left": "0",
+		        "status": "1"
+		    },
+		    "specImage": [
+		        {
+		            "id": "15",
+		            "product_id": "11",
+		            "spec_1": "黄色",
+		            "spec_2": "10寸",
+		            "image_1": "42422223.png"
+		        },
+		        {
+		            "id": "16",
+		            "product_id": "11",
+		            "spec_1": "蓝色",
+		            "spec_2": "11寸",
+		            "image_1": "43245532.png"
+		        }
+		    ]
+		}';
+    $.post("http://localhost/bowen/index.php/Factory/editProduct",
     {
-       
+       json:data
     },
     function(data){
     	//alert(data);

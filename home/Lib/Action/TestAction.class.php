@@ -1,7 +1,8 @@
 <?php
 class TestAction extends Action{
 	public function index(){
-		$this->display();
+		$ret = M('Product_info')->field('cost_price,distributor_price,salesman_price,left,status')->where("id='P1416717224'")->find();
+		dump($ret);exit;
 	}
 	
 	public function test(){

@@ -1,0 +1,60 @@
+<taglib name='Message' />
+
+<html>
+<head>
+<script type="text/javascript" src="__PUBLIC__/admin/js/jquery.js"></script>
+ <SCRIPT src="http://code.jquery.com/jquery-1.10.2.min.js"></SCRIPT> 
+<!-- <script type="text/javascript" src="__PUBLIC__/js/jquery-1.9.1.js"></script> -->
+<script>
+  $(document).ready(function(){
+  $("button").click(function(){
+	 var json = '{
+		    "productInfo": {
+		        "id": "11",
+		        "name": "商品",
+		        "model": "贺卡",
+		        "introduction": "描述",
+		        "cost_price": "10",
+		        "distribution_price": "12",
+		        "salesman_price": "20",
+		        "producer": "某地",
+		        "has_sale": "10",
+		        "left": "0",
+		        "status": "1"
+		    },
+		    "specImage": [
+		        {
+		            "id": "15",
+		            "product_id": "11",
+		            "spec_1": "黄色",
+		            "spec_2": "10寸",
+		            "image_1": "42422223.png"
+		        },
+		        {
+		            "id": "16",
+		            "product_id": "11",
+		            "spec_1": "蓝色",
+		            "spec_2": "11寸",
+		            "image_1": "43245532.png"
+		        }
+		    ]
+		}';
+	 
+	
+    $.post("http://localhost/bowen/index.php/Factory/editProduct",
+    {
+     	 json:json
+    },
+    function(data){
+    	alert(data['info']);
+    });
+  });
+});  
+
+</script>
+
+</head>
+<body>
+<button >通过 AJAX 改变内容</button>        
+</body>
+</html>

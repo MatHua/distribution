@@ -93,19 +93,33 @@ class FactoryAction extends Action {
 	 	$productInfo = $jsonArr['productInfo'];
 	 	$specImage = $jsonArr['specImage'];
 	 	
+	 	$productModel = D('Product_info');
+	 	$productModel->startTrans();	//事务处理
+	 	$specModel = D('Spec_image');
+	 	$specModel->startTrans();	//事务处理
+	 	
     	//增加商品基础信息以及规格照片
-    	if((!isset($productInfo['id']) || $productInfo['id'] == '') && (!isset($specImage[0]['id']) || $specImage[0]['id'] == '')  ){		
-    		$lastId = M('Product_info')->add($productInfo);
+    	if(!isset($productInfo['id']) && !isset($specImage[0]['id'])){		
+    		
+    		$productInfo['id'] = 'P'.time();
+    		$productInfo['cTime'] = time();
+    		
+    		if(!($productModel->create($productInfo)))	$this->ajaxReturn(0,'增加商品失败！',0);
+    		$lastId = $productModel->add();
     		if($lastId){
     			foreach ($specImage as $vo){
-    				$vo['product_id'] = $lastId;
+    				$vo['product_id'] = $productInfo['id'];
     				
-    				$ret = M('Spec_image')->add($vo);
+    				$ret = $specModel->add($vo);
     				if(!$ret){
-    					$this->ajaxReturn(0,"增加商品信息失败！",0);	//使用回调函数
+    					$productModel->rollback();	//插入失败回调
+    					$specModel->rollback();		//插入失败回调
+    					$this->ajaxReturn(0,"增加商品信息失败！！",0);	//使用回调函数
     				}
   					//事务处理
     			}
+    			$productModel->commit();	//插入成功，提交
+    			$specModel->commit();		//插入成功，提交
     			$this->ajaxReturn(0,"增加商品信息成功！",1);
  
     		}else{
@@ -114,18 +128,27 @@ class FactoryAction extends Action {
     	}
     	
     	//修改商品信息
-    	$flag = 0;	//标志是否成功！
-    	$ret = M('Product_info')->save($productInfo);
-    	if($ret)	$flag = 1;
+    	$flag = 1;	//标志是否成功！
+    	if(isset($productInfo)){
+    		$ret = $productModel->save($productInfo);
+    		if(!$ret){
+    			$flag = 0;
+    		}
+    	}
     	foreach ($specImage as $vo){	
-    		$ret = M('Spec_image')->save($vo);
-    		if ($ret) {
-    			$flag = 1;
+    		$ret = $specModel->save($vo);
+    		if (!$ret) {
+    			$flag = 0;
     		}
     	} 
+    	
     	if ($flag) {
+    		$productModel->commit();	//修改成功，提交
+    		$specModel->commit();		//修改成功，提交
     		$this->ajaxReturn(0,"修改商品信息成功！",1);
     	}else{
+    		$productModel->rollback();	//修改失败回调
+    		$specModel->rollback();		//修改失败回调
     		$this->ajaxReturn(0,"修改商品信息失败！",0);
     	}
     	
@@ -319,9 +342,72 @@ class FactoryAction extends Action {
     
     /**
      * 增加或者修改订单信息
+     * 【post】
+     * @param $id 标识值(修改)
+     * @param $order_id 订单ID
+     * @param $custom_id : 顾客ID
+     * @parma $distributor_id 分销商ID
+     * @param $delivery_id : 送货ID（联系方式，送货地址，签收人姓名）
+     * @param $status : 定单状态
+     * @param $confirm : 是否确认（null 0：取消 1：确认）
+     * 
+     * @param $product_id : 商品ID
+     * @param $amount : 商品的数量
+     * @parma $spec_id : 规格
+     * @param $unit_price : 分销商ID
+     * @param $total_price : 销售员ID
+  	 * @param $cTime : 创建时间
      */
     public function editOrder(){
-    		
+    	if(!isset($_POST['json']) || $_POST['json'] == ''){
+	 		$this->ajaxReturn(0,"数据格式不正确",0);
+	 	}    	
+	 	$jsonArr = json_decode($_POST['json'],true);
+	 	$baseInfo = $jsonArr['baseInfo'];
+	 	$productList = $jsonArr['productList'];
+	 
+    	if( !isset($baseInfo) || $baseInfo == '' || !isset($productList) || $productList == '' ){
+    		$this->ajaxReturn(0, '数据有误', 0);
+    	}	
+    	
+    	if(isset($productList[0]['id']) && $productList[0]['id'] != ''){
+    		$mode = 0;	//0标识修改数据
+    	}else{
+    		$mode = 1;	//1标志增加数据
+    		$baseInfo['order_id'] = time();
+    		$baseInfo['cTime'] = time();
+    	}
+    	
+    	$orderList = D('Order_list');
+    	$orderList->startTrans();		//启动事务处理
+    	foreach ( $productList as $vo){
+ 
+    		$_POST = array_merge($baseInfo,$vo);
+    	
+     		if(!$orderList->create()){
+     			$orderList->rollback();		//回调
+     			$this->ajaxReturn(0,'数据不正确！！',0);
+     		}else{
+     			if(!$mode){		
+		     		$lastId = $orderList->save();
+		     		if(!$lastId){
+		     			$orderList->rollback();
+		     			$this->ajaxReturn(0,'修改订单失败！！',0);
+		     		}
+     			}
+     			else{ 
+     				$lastId = $orderList->add();
+					if(!$lastId){
+						$orderList->rollback();
+						$this->ajaxReturn(0,'增加订单失败！！',0);
+					}
+     			}  
+     		}
+     		$_POST = null;
+    	}
+    	$orderList->commit();	//提交
+    	if($mode)	$this->ajaxReturn(0,'增加订单成功！',1);
+    	else		$this->ajaxReturn(0,'修改订单成功！',1);
     }
     
     /**
@@ -355,7 +441,7 @@ class FactoryAction extends Action {
     		$this->ajaxReturn(0, '参数不正确', 0);
     	}
     	
-    	$map['confirm'] = array('eq',1);	//订单厂家已经确认
+    	$map['status'] = array('gt',0);	//订单状态为已付款、货到付款、配送中、交易成功
     	$map['cTime'] = array('between',array(strtotime($_POST['start']),strtotime($_POST['end'])+86400));
     	
     	if($_POST['unit'] == 'day'){		//以周为单位
@@ -379,7 +465,7 @@ class FactoryAction extends Action {
     		$this->ajaxReturn(0, '参数不正确', 0);
     	}
    
-    	$map['confirm'] = array('eq',1);	//订单厂家已经确认
+    	$map['confirm'] = array('gt',0);	//订单厂家已经确认
     	$map['cTime'] = array('between',array(strtotime($_POST['start']),strtotime($_POST['end'])+86400));
     	 
   		$ret = D('Order_list')->relation('productInfo')->field('SUM(total_price) sale_price,SUM(amount) sale_amount,product_id')->where($map)->order('sale_amount desc')->group('product_id')->select();
@@ -403,7 +489,7 @@ class FactoryAction extends Action {
     	//获取某商品在各个分销商的总销售额以及销售件数
     	if( $_POST['product_id'] != '' && isset($_POST['product_id']) ){
     		$map['product_id'] = $_POST['product_id'];
-    		$map['confirm'] = array('eq',1);	//订单厂家已经确认
+    		$map['confirm'] = array('gt',0);	//订单厂家已经确认
     		$map['cTime'] = array('between',array(strtotime($_POST['start']),strtotime($_POST['end'])+86400));
     		
     		$ret = D('Order_list')->relation(array('distributorInfo','productInfo'))->field('SUM(total_price) sale_price,SUM(amount) sale_amount,distributor_id,product_id')->where($map)->order('sale_amount desc')->group('distributor_id')->select();

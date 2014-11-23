@@ -11,4 +11,6 @@ class Product_infoModel extends RelationModel{
 			 
 	);
 	
+
+
 }

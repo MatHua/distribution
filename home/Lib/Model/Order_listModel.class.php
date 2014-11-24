@@ -66,6 +66,7 @@ class Order_listModel extends RelationModel{
 			array('phone','require','没有送货地址!',1,'regex',1),
 			array('name','require','没有送货地址!',1,'regex',1),
 			array('status','require','没有订单状态!',1,'regex',1),
+			array('cTime','require','没有下单时间!',1,'regex',1),
 			
 		  	array('product_id','checkProductId','没有此商品ID!',1,'callback',3),
  		  	array('amount','checkAmount','没有库存了!',1,'callback',3),   
@@ -76,8 +77,7 @@ class Order_listModel extends RelationModel{
 			
 	);
 	
-	protected $_auto= array(
-		 	array('cTime','time',1,'function'),	 
+	protected $_auto= array( 
 		 	array('unit_price','getUnitPrice',3,'callback'),
 			array('total_price','getTotalPrice',3,'callback'),
 			
@@ -103,7 +103,6 @@ class Order_listModel extends RelationModel{
 		
 		$ret = M('Product_info')->field('cost_price,distributor_price,salesman_price,left,status')->where(array('id'=>$_POST['product_id']))->find();
 		$amount = 0;
-	
 		if (isset($_POST['id']) && $_POST['id'] != '') {
 			$amount = M('Order_list')->where('id='.$_POST['id'])->getField('amount');
 		}
@@ -116,6 +115,7 @@ class Order_listModel extends RelationModel{
 			$this->left = $ret['left']+$amount;
 			return true;
 		}else 
+			
 			return false;
 	}
 

@@ -433,7 +433,7 @@ class FactoryAction extends Action {
     		$this->ajaxReturn(0, '参数不正确', 0);
     	}
     	
-    	$map['status'] = array('gt',0);	//订单状态为已付款、货到付款、配送中、交易成功
+    	$map['status'] = array('gt',1);	//订单状态为已付款、货到付款、配送中、交易成功
     	$map['cTime'] = array('between',array(strtotime($_POST['start']),strtotime($_POST['end'])+86400));
     	
     	if($_POST['unit'] == 'day'){		//以周为单位
@@ -463,7 +463,7 @@ class FactoryAction extends Action {
     				and 
   				product_info.status = 1
   					and
-  				order_list.status >0
+  				order_list.status > 1
   				 	and
   				order_list.cTime >= '.$start.' and order_list.cTime <= '.$end;
   	
@@ -494,7 +494,7 @@ class FactoryAction extends Action {
     	//获取某商品在各个分销商的总销售额以及销售件数
     	if( $_POST['product_id'] != '' && isset($_POST['product_id']) ){
     		$map['product_id'] = $_POST['product_id'];
-    		$map['status'] = array('gt',0);	//订单厂家已经确认
+    		$map['status'] = array('gt',1);	//订单厂家已经确认
     		$map['cTime'] = array('between',array(strtotime($_POST['start']),strtotime($_POST['end'])+86400));
     		
     		$ret = D('Order_list')->relation(array('distributorInfo','productInfo'))->field('SUM(total_price) sale_price,SUM(amount) sale_amount,distributor_id,product_id')->where($map)->order('sale_amount desc')->group('distributor_id')->select();
@@ -502,7 +502,7 @@ class FactoryAction extends Action {
     	}
     	
     	//获取各个分销商的总销售情况
-    	$map['status'] = array('eq',1);	//订单厂家已经确认
+    	$map['status'] = array('gt',1);	//订单厂家已经确认
     	$map['cTime'] = array('between',array(strtotime($_POST['start']),strtotime($_POST['end'])+86400));
     	
     	$ret = D('Order_list')->relation('distributorInfo')->field('SUM(total_price) sale_price,distributor_id')->where($map)->group('distributor_id')->order('sale_price desc')->select();

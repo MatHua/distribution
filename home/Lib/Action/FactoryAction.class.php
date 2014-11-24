@@ -92,6 +92,8 @@ class FactoryAction extends Action {
 	 	$jsonArr = json_decode($_POST['json'],true);
 	 	$productInfo = $jsonArr['productInfo'];
 	 	$specImage = $jsonArr['specImage'];
+	 		 	
+	 	if(!isset($productInfo) && !isset($specImage))	$this->ajaxReturn(0,'没有商品的基本信息或者规格图片！',0);
 	 	
 	 	$productModel = D('Product_info');
 	 	$productModel->startTrans();	//事务处理
@@ -99,8 +101,7 @@ class FactoryAction extends Action {
 	 	$specModel->startTrans();	//事务处理
 	 	
     	//增加商品基础信息以及规格照片
-    	if(!isset($productInfo['id']) && !isset($specImage[0]['id'])){		
-    		
+    	if(isset($productInfo) && !isset($productInfo['id']) && isset($specImage)){					
     		$productInfo['id'] = 'P'.time();
     		$productInfo['cTime'] = time();
     		
@@ -303,7 +304,7 @@ class FactoryAction extends Action {
     		$where['status'] = $_POST['status'];
     	}
     	
-    	$ret = D('Order_list')->relation(array('distributorInfo','customInfo','productInfo'))->where($where)->order( $order )->limit($limit)->select();
+    	$ret = D('Order_list')->relation(array('distributorInfo','productInfo'))->where($where)->order( $order )->limit($limit)->select();
     	
     	$arr = array();
     	foreach ($ret as $key => $value){
@@ -329,7 +330,7 @@ class FactoryAction extends Action {
     	if(!isset($_GET['order_id']) || $_GET['order_id'] == '')
     		$this->ajaxReturn(0, '没有指定订单ID', 0);
     	$where['order_id'] = $_GET['order_id'];
-    	$ret = D('Order_list')->relation(array('distributorInfo','customInfo','productInfo','specImage'))->where($where)->select();
+    	$ret = D('Order_list')->relation(array('distributorInfo','productInfo','specImage'))->where($where)->select();
     	
     	$arr = array();
     	foreach ($ret as $key => $value){
@@ -341,73 +342,64 @@ class FactoryAction extends Action {
     }
     
     /**
-     * 增加或者修改订单信息
+     * 修改订单中商品信息
      * 【post】
-     * @param $id 标识值(修改)
-     * @param $order_id 订单ID
-     * @param $custom_id : 顾客ID
+     * @param $id 标识值
+     * @param $salesman_id 销售员ID
      * @parma $distributor_id 分销商ID
-     * @param $delivery_id : 送货ID（联系方式，送货地址，签收人姓名）
-     * @param $status : 定单状态
-     * @param $confirm : 是否确认（null 0：取消 1：确认）
-     * 
      * @param $product_id : 商品ID
      * @param $amount : 商品的数量
      * @parma $spec_id : 规格
-     * @param $unit_price : 分销商ID
-     * @param $total_price : 销售员ID
-  	 * @param $cTime : 创建时间
+     * @param $unit_price（可选） : 单价
+     * @param $total_price （可选）: 总价
      */
-    public function editOrder(){
-    	if(!isset($_POST['json']) || $_POST['json'] == ''){
-	 		$this->ajaxReturn(0,"数据格式不正确",0);
-	 	}    	
-	 	$jsonArr = json_decode($_POST['json'],true);
-	 	$baseInfo = $jsonArr['baseInfo'];
-	 	$productList = $jsonArr['productList'];
-	 
-    	if( !isset($baseInfo) || $baseInfo == '' || !isset($productList) || $productList == '' ){
-    		$this->ajaxReturn(0, '数据有误', 0);
-    	}	
+    public function editOrderPt(){
     	
-    	if(isset($productList[0]['id']) && $productList[0]['id'] != ''){
-    		$mode = 0;	//0标识修改数据
-    	}else{
-    		$mode = 1;	//1标志增加数据
-    		$baseInfo['order_id'] = time();
-    		$baseInfo['cTime'] = time();
-    	}
+    	//过滤掉这几个，因为如果一个订单中的一个商品的送货地址
+    	unset($_POST['order_id']);
+    	unset($_POST['address']);
+    	unset($_POST['phone']);
+    	unset($_POST['name']);
+    	unset($_POST['status']);
+    	unset($_POST['cTime']);
     	
     	$orderList = D('Order_list');
-    	$orderList->startTrans();		//启动事务处理
-    	foreach ( $productList as $vo){
- 
-    		$_POST = array_merge($baseInfo,$vo);
     	
-     		if(!$orderList->create()){
-     			$orderList->rollback();		//回调
-     			$this->ajaxReturn(0,'数据不正确！！',0);
-     		}else{
-     			if(!$mode){		
-		     		$lastId = $orderList->save();
-		     		if(!$lastId){
-		     			$orderList->rollback();
-		     			$this->ajaxReturn(0,'修改订单失败！！',0);
-		     		}
-     			}
-     			else{ 
-     				$lastId = $orderList->add();
-					if(!$lastId){
-						$orderList->rollback();
-						$this->ajaxReturn(0,'增加订单失败！！',0);
-					}
-     			}  
-     		}
-     		$_POST = null;
+    	if(!$orderList->create()){		
+     		$this->ajaxReturn(0,$orderList->getError(),0);
+     	}
+     	
+     	$lastId = $orderList->save();
+		if(!$lastId){
+		     $this->ajaxReturn(0,'修改订单信息失败！！',0);
+		}
+    	
+    	$this->ajaxReturn(0,'修改订单信息成功！',1);
+    }
+    
+    /**
+    * 修改定单中基础的送货信息
+    * @param $order_id 		订单ID
+	* @param $address(可选)	地址
+	* @parma $phone(可选)		电话
+	* @param $name(可选)		姓名
+	* @param $status（可选）	订单状态
+    */
+    public function editOrderBI(){
+    	if(!isset($_POST['order_id']) || $_POST['order_id'] == ''){
+    		$this->ajaxReturn(0,'没有传订单ID',0);
     	}
-    	$orderList->commit();	//提交
-    	if($mode)	$this->ajaxReturn(0,'增加订单成功！',1);
-    	else		$this->ajaxReturn(0,'修改订单成功！',1);
+  		
+    	if (isset($_POST['address'])) $map['address']=$_POST['address'];
+    	if (isset($_POST['phone'])) $map['phone']=$_POST['phone'];
+    	if (isset($_POST['name'])) $map['name']=$_POST['name'];
+    	if (isset($_POST['status'])) $map['status']=$_POST['status'];
+    
+    	$ret = M('order_list')->where('order_id='.$_POST['order_id'])->save($map);
+    	if($ret)
+    		$this->ajaxReturn(0,'修改订单信息成功！',1);
+    	else
+    		$this->ajaxReturn(0,'修改订单信息失败！',0);
     }
     
     /**
@@ -465,11 +457,24 @@ class FactoryAction extends Action {
     		$this->ajaxReturn(0, '参数不正确', 0);
     	}
    
-    	$map['confirm'] = array('gt',0);	//订单厂家已经确认
-    	$map['cTime'] = array('between',array(strtotime($_POST['start']),strtotime($_POST['end'])+86400));
-    	 
-  		$ret = D('Order_list')->relation('productInfo')->field('SUM(total_price) sale_price,SUM(amount) sale_amount,product_id')->where($map)->order('sale_amount desc')->group('product_id')->select();
-    	
+  	 	$start = strtotime($_POST['start']);
+  		$end   = strtotime($_POST['end'])+86400;
+  		$join = ' order_list ON product_info.id = order_list.product_id
+    				and 
+  				product_info.status = 1
+  					and
+  				order_list.status >0
+  				 	and
+  				order_list.cTime >= '.$start.' and order_list.cTime <= '.$end;
+  	
+  		$ret = D('Product_info')->join($join)->field('SUM(total_price) sale_price,SUM(amount) sale_amount,product_info.id')->order('sale_amount desc')->group('product_info.id')->select();
+  	
+  		foreach ($ret as $key=> &$vo){
+  			
+  			$vo['sale_amount'] = $vo['sale_amount'] == NULL ? 0 : $vo['sale_amount'];
+  			$vo['sale_price'] = $vo['sale_price'] == NULL ? 0 :$vo['sale_price'];
+  			
+  		}
     	$this->ajaxReturn($ret,'各个商品的总销售情况成功',1);
     }
     
@@ -489,7 +494,7 @@ class FactoryAction extends Action {
     	//获取某商品在各个分销商的总销售额以及销售件数
     	if( $_POST['product_id'] != '' && isset($_POST['product_id']) ){
     		$map['product_id'] = $_POST['product_id'];
-    		$map['confirm'] = array('gt',0);	//订单厂家已经确认
+    		$map['status'] = array('gt',0);	//订单厂家已经确认
     		$map['cTime'] = array('between',array(strtotime($_POST['start']),strtotime($_POST['end'])+86400));
     		
     		$ret = D('Order_list')->relation(array('distributorInfo','productInfo'))->field('SUM(total_price) sale_price,SUM(amount) sale_amount,distributor_id,product_id')->where($map)->order('sale_amount desc')->group('distributor_id')->select();
@@ -497,7 +502,7 @@ class FactoryAction extends Action {
     	}
     	
     	//获取各个分销商的总销售情况
-    	$map['confirm'] = array('eq',1);	//订单厂家已经确认
+    	$map['status'] = array('eq',1);	//订单厂家已经确认
     	$map['cTime'] = array('between',array(strtotime($_POST['start']),strtotime($_POST['end'])+86400));
     	
     	$ret = D('Order_list')->relation('distributorInfo')->field('SUM(total_price) sale_price,distributor_id')->where($map)->group('distributor_id')->order('sale_price desc')->select();

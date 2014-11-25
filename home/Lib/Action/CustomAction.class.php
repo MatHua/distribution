@@ -39,6 +39,7 @@ class CustomAction extends Action{
 	 	
 	 	$orderBI['cTime'] = time();
 	 	$orderBI['order_id'] = time();
+	 	$orderBI['custom_id'] = $_SESSION['userId'];
 
 	 	$model = D('Order_list');
 	 	$model->startTrans();	//开启事务模式
@@ -79,7 +80,7 @@ class CustomAction extends Action{
 		
 		$limit = null;
 		$page = 0;   //是否分页
-		$where['custom_id'] = $_SESSION['userId'] = 1;
+		$where['custom_id'] = $_SESSION['userId'];
 		
 		//组合显示条数limit,分页
     	if( isset($_POST['current_page']) && $_POST['current_page'] != '' && isset($_POST['page_size']) && $_POST['page_size'] != '' ){
@@ -112,6 +113,5 @@ class CustomAction extends Action{
 		
 		$this->ajaxReturn($data,"获取成功",1);
 	}
-	
 	
 }

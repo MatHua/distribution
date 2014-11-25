@@ -304,7 +304,7 @@ class FactoryAction extends Action {
     		$where['status'] = $_POST['status'];
     	}
     	
-    	$ret = D('Order_list')->relation(array('distributorInfo','productInfo'))->where($where)->order( $order )->limit($limit)->select();
+    	$ret = D('Order_list')->relation(array('distributorInfo','productInfo'))->where($where)->order( $order )->select();
     	
     	$arr = array();
     	foreach ($ret as $key => $value){
@@ -424,7 +424,7 @@ class FactoryAction extends Action {
      *  [post]
      *  @param $unit : 统计单位
      *  		       值    ： month（月）、day（天）
-     *  @param $start  : 选择查询开始日期(2014-09、2014-09-10)
+     *  @param $start  : 选择查询开始日期(时间戳)
      *  @param $end    : 选择查询结束日期
      */
     public function getAllSale(){
@@ -434,7 +434,7 @@ class FactoryAction extends Action {
     	}
     	
     	$map['status'] = array('gt',1);	//订单状态为已付款、货到付款、配送中、交易成功
-    	$map['cTime'] = array('between',array(strtotime($_POST['start']),strtotime($_POST['end'])+86400));
+    	$map['cTime'] = array('between',array($_POST['start'],$_POST['end']));
     	
     	if($_POST['unit'] == 'day'){		//以周为单位
     		$ret = D('Order_list')->field('SUM(total_price) sale_price,FROM_UNIXTIME(cTime, "%Y-%m-%d") day')->where($map)->order('sale_price desc')->group('day')->select();
@@ -449,7 +449,7 @@ class FactoryAction extends Action {
      * 获取各个商品某个时间段的总销售额和件数(月业绩、日业绩)
      *  [post]
      *  
-     *  @param $start  : 选择查询开始日期(2014-09、2014-09-10)
+     *  @param $start  : 选择查询开始日期(时间戳)
      *  @param $end    : 选择查询结束日期
      */
     public function getProductSale(){
@@ -457,23 +457,21 @@ class FactoryAction extends Action {
     		$this->ajaxReturn(0, '参数不正确', 0);
     	}
    
-  	 	$start = strtotime($_POST['start']);
-  		$end   = strtotime($_POST['end'])+86400;
-  		$join = ' order_list ON product_info.id = order_list.product_id
-    				and 
-  				product_info.status = 1
+  	 	$start = $_POST['start'];
+  		$end   = $_POST['end'];
+  		$join = 'order_list ON order_list.product_id =product_info.id  
   					and
-  				order_list.status > 1
-  				 	and
-  				order_list.cTime >= '.$start.' and order_list.cTime <= '.$end;
+  				order_list.status > 1 
+  		 		 	and
+  				order_list.cTime >= '.$start.' and order_list.cTime <= '.$end; 
   	
-  		$ret = D('Product_info')->join($join)->field('SUM(total_price) sale_price,SUM(amount) sale_amount,product_info.id')->order('sale_amount desc')->group('product_info.id')->select();
-  	
-  		foreach ($ret as $key=> &$vo){
+  		$ret = D('Product_info')->join($join)->field('SUM(total_price) sale_price,SUM(amount) sale_amount,SUM(factory_profit) factory_profit,product_info.id,product_info.name product_name,cost_price,distributor_price,salesman_price')->where('product_info.status = 1')->order('sale_amount desc')->group('product_info.id')->select();
+  		
+  	 	foreach ($ret as $key=> &$vo){
   			
   			$vo['sale_amount'] = $vo['sale_amount'] == NULL ? 0 : $vo['sale_amount'];
   			$vo['sale_price'] = $vo['sale_price'] == NULL ? 0 :$vo['sale_price'];
-  			
+  			$vo['factory_profit'] = $vo['factory_profit'] == NULL ? 0 :$vo['factory_profit'];
   		}
     	$this->ajaxReturn($ret,'各个商品的总销售情况成功',1);
     }
@@ -483,7 +481,7 @@ class FactoryAction extends Action {
      *  获取各个分销商的总销售情况
      *	[post]
      *  @param $product_id（可选） : 商品的ID
-     *  @param $start  : 选择查询开始日期(2014-09、2014-09-10)
+     *  @param $start  : 选择查询开始日期(时间戳)
      *  @param $end    : 选择查询结束日期
      */
     public function getDistributorSale(){
@@ -495,7 +493,7 @@ class FactoryAction extends Action {
     	if( $_POST['product_id'] != '' && isset($_POST['product_id']) ){
     		$map['product_id'] = $_POST['product_id'];
     		$map['status'] = array('gt',1);	//订单厂家已经确认
-    		$map['cTime'] = array('between',array(strtotime($_POST['start']),strtotime($_POST['end'])+86400));
+    		$map['cTime'] = array('between',array($_POST['start'],$_POST['end']));
     		
     		$ret = D('Order_list')->relation(array('distributorInfo','productInfo'))->field('SUM(total_price) sale_price,SUM(amount) sale_amount,distributor_id,product_id')->where($map)->order('sale_amount desc')->group('distributor_id')->select();
     		$this->ajaxReturn($ret,'获取该商品在各个分销商的销售情况成功',1);
@@ -503,7 +501,7 @@ class FactoryAction extends Action {
     	
     	//获取各个分销商的总销售情况
     	$map['status'] = array('gt',1);	//订单厂家已经确认
-    	$map['cTime'] = array('between',array(strtotime($_POST['start']),strtotime($_POST['end'])+86400));
+    	$map['cTime'] = array('between',array($_POST['start'],$_POST['end']));
     	
     	$ret = D('Order_list')->relation('distributorInfo')->field('SUM(total_price) sale_price,distributor_id')->where($map)->group('distributor_id')->order('sale_price desc')->select();
     		 

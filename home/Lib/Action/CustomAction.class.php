@@ -39,6 +39,7 @@ class CustomAction extends Action{
 	 	
 	 	$orderBI['cTime'] = time();
 	 	$orderBI['order_id'] = time();
+	 	$orderBI['custom_id'] = $_SESSION['userId'];
 
 	 	$model = D('Order_list');
 	 	$model->startTrans();	//开启事务模式
@@ -64,4 +65,53 @@ class CustomAction extends Action{
 	 	$model->commit();
 	 	$this->ajaxReturn(0,'下单成功！',1);
 	} 
+	
+	/**
+	 * 获取客户自己的订单
+	 * 【POST】
+	 * @param $status(可选) 订单状态：0：失败、1：未付款、2：已付款、3：货到付款、4：已付款、5、配送中、6：成功
+	 * 
+	 * @param $searchTime(可选) ： 查询几个月的订单    1：一个月的订单、3：三个月的订单、6：半年的订单
+	 *
+	 * @param $current_page（可选） ： 第几页
+     * @param $page_size（可选）：每页显示数
+	 */
+	public function getOrder(){
+		
+		$limit = null;
+		$page = 0;   //是否分页
+		$where['custom_id'] = $_SESSION['userId'];
+		
+		//组合显示条数limit,分页
+    	if( isset($_POST['current_page']) && $_POST['current_page'] != '' && isset($_POST['page_size']) && $_POST['page_size'] != '' ){
+    		$offset = ($_POST['current_page']-1)*$_POST['page_size'];
+    		$length = $_POST['page_size'];
+    		$page = 1;
+    	}
+		
+		if( isset($_POST['status']) && $_POST['status'] != '')
+			$where['status'] = $_POST['status'];
+		
+		if( $_POST['searchTime'] != '' || isset($_POST['searchTime']) ){
+			$where['cTime'] = array('between',array(strtotime(date('Y-m-d'))-$_POST['searchTime']*2592000+86400,strtotime(date('Y-m-d'))+86400 ));
+		}
+		
+		$amount = D('Order_list')->where( $where )->getField('count(*)');
+		$ret = D('Order_list')->relation('productInfo,specImage')->field('amount,id,unit_price,total_price,address,phone,name,status,cTime,order_id')->where( $where )->select();
+		
+		$arr = array();
+		foreach ($ret as $key => $value){
+			$orderId = $value['order_id'];
+			$arr[$orderId][] = $value;
+		}
+		$data = array_slice($arr,$offset,$length,true);
+		
+		//获取页数
+		if($page)			$data['page_amount'] = ceil($amount/$_POST['page_size']);	//有符合条件的商品,分页
+		else if($amount)	$data['page_amount'] = 1;	//有符合条件的商品,但不分页
+		else				$data['page_amount'] = 0;	//没有符合条件的商品
+		
+		$this->ajaxReturn($data,"获取成功",1);
+	}
+	
 }

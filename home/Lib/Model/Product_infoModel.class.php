@@ -8,7 +8,6 @@ class Product_infoModel extends RelationModel{
           		'class_name'=>'spec_image',
           		'foreign_key'=>'product_id',		
 			)
-			 
 	);
 	
 

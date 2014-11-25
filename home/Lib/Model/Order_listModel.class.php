@@ -68,6 +68,7 @@ class Order_listModel extends RelationModel{
 			array('status','require','没有订单状态!',1,'regex',1),
 			array('cTime','require','没有下单时间!',1,'regex',1),
 			
+			array(array('distributor_id','salesman_id'),'checkDS','非法传值!',1,'callback',3),	//检查是否存在此分销商以及销售员
 		  	array('product_id','checkProductId','没有此商品ID!',1,'callback',3),
  		  	array('amount','checkAmount','没有库存了!',1,'callback',3),   
  		
@@ -143,5 +144,14 @@ class Order_listModel extends RelationModel{
 		}else 
 			return 0;
 	}
-
+	
+	protected function checkDS($data){
+		$data['id'] = $data['salesman_id'];
+		$ret = M('salesman_info')->where($data)->select();
+		if($ret)
+			return true;
+		else 
+			return false;
+	}
+	
 }

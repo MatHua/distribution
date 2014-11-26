@@ -364,6 +364,7 @@ class FactoryAction extends Action {
     	unset($_POST['cTime']);
     	
     	$orderList = D('Order_list');
+    	$orderList->startTrans();
     	
     	if(!$orderList->create()){		
      		$this->ajaxReturn(0,$orderList->getError(),0);
@@ -372,9 +373,35 @@ class FactoryAction extends Action {
      	$lastId = $orderList->save();
 		if(!$lastId){
 		     $this->ajaxReturn(0,'修改订单信息失败！！',0);
+		}else{		//检查是否需要更新销售表product_info
+			$differ = $_POST['amount'] - $_POST['origin_amount'];
+			if($differ == 0){
+				$orderList->commit();
+				$this->ajaxReturn(0,'修改订单信息成功！',1);
+			}else{		//更新销售表product_info
+				$productModel = M('Product_info');
+				$productModel->startTrans();
+				
+				if($differ > 0){
+					$data['has_sale'] = array('exp','has_sale+'.$differ);
+					$data['stock'] = array('exp','stock-'.$differ);
+				}else{
+					$data['has_sale'] = array('exp','has_sale-'.abs($differ));
+					$data['stock'] = array('exp','stock+'.abs($differ));
+				}
+			    
+				$ret = $productModel->where(array('id'=>$_POST['product_id']))->save($data);
+				if(!$ret){
+					$orderList->rollback();
+					$productModel->rollback();
+					$this->ajaxReturn(0,'修改订单信息失败！',0);
+				}
+				$productModel->commit();
+				$orderList->commit();
+				$this->ajaxReturn(0,'修改订单信息成功！',1);
+			}
 		}
     	
-    	$this->ajaxReturn(0,'修改订单信息成功！',1);
     }
     
     /**

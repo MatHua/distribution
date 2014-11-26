@@ -1,8 +1,21 @@
 <?php
 class TestAction extends Action{
+	
 	public function index(){
-		$ret = M('Product_info')->field('cost_price,distributor_price,salesman_price,left,status')->where("id='P1416717224'")->find();
-		dump($ret);exit;
+		$test = M('test'); // 实例化User对象
+		$test1 = M('test1');
+		$test->startTrans();
+		$test1->startTrans();
+		$data['i'] = 10;
+		$data['id'] = 1;
+		$a = $test->save($data);
+		$b = $test1->save($data);
+		if($a && $b){
+			$test->commit();
+			$test->commit();
+			dump("success");
+		} 
+	
 	}
 	
 	public function test(){

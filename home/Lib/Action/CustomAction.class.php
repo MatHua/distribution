@@ -9,7 +9,7 @@ class CustomAction extends Action{
 		if(!isset($_POST['id']) || $_POST['id'] == '')
 			$this->ajaxReturn(0,'没有选择查看那个商品',0);
 		$map['id'] = $_POST['id'];
-		$ret = D('Product_info')->relation('specImage')->field('id,name,left,has_sale,introduction,description')->where($map)->find();
+		$ret = D('Product_info')->relation('specImage')->field('id,name,stock,has_sale,introduction,description')->where($map)->find();
 		if($ret)
 			$this->ajaxReturn($ret,'获取商品信息成功！',1);
 		else
@@ -42,7 +42,9 @@ class CustomAction extends Action{
 	 	$orderBI['custom_id'] = $_SESSION['userId'];
 
 	 	$model = D('Order_list');
+	 	$productModel = M('Product_info');
 	 	$model->startTrans();	//开启事务模式
+	 	$productModel->startTrans();
 	 	
 	 	foreach ($orderPt as $key => $vo){
 		 	//过滤值
@@ -54,14 +56,27 @@ class CustomAction extends Action{
 
 			if(!$model->create()){
 				$model->rollback();
+				$productModel->rollback();
 				$this->ajaxReturn(0,$model->getError(),0);
 			}
 			if(!($model->add())){
 				$model->rollback();
+				$productModel->rollback();
+				$this->ajaxReturn(0,'由于某些未知原因，下单失败！',0);
+			}
+			
+			//更新该商品的库存以及销售量
+			$data['has_sale'] = array('exp','has_sale+'.$vo['amount']);
+			$data['stock'] = array('exp','stock-'.$vo['amount']);
+			$ret = $productModel->where(array('id'=>$vo['product_id']))->save($data);
+	
+			if(!$ret){
+				$model->rollback();
+				$productModel->rollback();
 				$this->ajaxReturn(0,'由于某些未知原因，下单失败！',0);
 			}
 	 	}
-	 	
+	 	$productModel->commit();
 	 	$model->commit();
 	 	$this->ajaxReturn(0,'下单成功！',1);
 	} 

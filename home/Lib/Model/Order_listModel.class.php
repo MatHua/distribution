@@ -4,7 +4,7 @@ class Order_listModel extends RelationModel{
 	protected $cost_price;	//成本价
 	protected $distributor_price;	//分销商价格
 	protected $salesman_price;	//销售员价格
-	protected $stock; //库存量
+	protected $left; //库存量
 	
 	protected $_link=array(
 	
@@ -102,12 +102,10 @@ class Order_listModel extends RelationModel{
 	
 	protected function checkProductId(){
 		
-		$ret = M('Product_info')->field('cost_price,distributor_price,salesman_price,stock,status')->where(array('id'=>$_POST['product_id']))->find();
+		$ret = M('Product_info')->field('cost_price,distributor_price,salesman_price,left,status')->where(array('id'=>$_POST['product_id']))->find();
 		$amount = 0;
-		
 		if (isset($_POST['id']) && $_POST['id'] != '') {
 			$amount = M('Order_list')->where('id='.$_POST['id'])->getField('amount');
-			$_POST['origin_amount'] = $amount;	//保存未修改前的商品数量，避免修改之后重复查询一次，以便订单修改之后，商品表中的销售量更新一次
 		}
 
 		if ($ret) {
@@ -115,14 +113,15 @@ class Order_listModel extends RelationModel{
 			$this->cost_price = $ret['cost_price'];
 			$this->distributor_price = $ret['distributor_price'];
 			$this->salesman_price = $ret['salesman_price'];
-			$this->stock = $ret['stock']+$amount;
+			$this->left = $ret['left']+$amount;
 			return true;
 		}else 
+			
 			return false;
 	}
 
 	protected function checkAmount(){
-		if($this->stock < $_POST['amount'])  return false;
+		if($this->left < $_POST['amount'])	return false;
 		else	return true;
 	}
 	

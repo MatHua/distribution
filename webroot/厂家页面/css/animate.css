@@ -1,0 +1,19 @@
+.rotateIn{
+    -webkit-animation:rotateIn 1s .2s ease both;
+    -moz-animation:rotateIn 1s .2s ease both;}
+@-webkit-keyframes rotateIn{
+    0%{-webkit-transform-origin:center center;
+        -webkit-transform:rotate(-200deg);
+        opacity:0}
+    100%{-webkit-transform-origin:center center;
+        -webkit-transform:rotate(0);
+        opacity:1}
+}
+@-moz-keyframes rotateIn{
+    0%{-moz-transform-origin:center center;
+        -moz-transform:rotate(-200deg);
+        opacity:0}
+    100%{-moz-transform-origin:center center;
+        -moz-transform:rotate(0);
+        opacity:1}
+}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link href="css/style.css" rel="stylesheet">
+    <script src="js/jquery-1.11.0.min.js"></script>
+</head>
+<body>
+<div id="Listarea">
+    <div id="List_Operate">
+        <div class="operate">
+            <input type="checkbox" name="sp" id="CheckAll" onclick="checkAll(this,this.name)"/><a id="Allselect">全选</a><a id="creat_new_good">添加</a><a id="Delect_goods">删除</a>
+        </div>
+        <div class="search">
+            <input type="text" placeholder="请输入关键词" value="" autocomplete="off" id="searchkey"/><div id="go">搜索<span></span></div>
+        </div>
+        <div class="sort">
+            <a id="sort_cb" data-status="up" name="cost_price">成本价<span></span></a>
+            <a id="sort_fx" data-status="up" name="distributor_price">分销价<span></span></a>
+            <a id="sort_ls" data-status="up" name="salesman_price">零售价<span></span></a>
+            <a id="sort_lb" data-status="up" name="has_sale">销量<span></span></a>
+            <a id="sort_sj" data-status="up" name="cTime">上架时间<span></span></a>
+        </div>
+    </div>
+    <div id="List_goodsarea" class="clearfix">
+            <!-详细商品-->
+    </div>
+    <div id="List_pages">
+        <div class="pagenum">
+        </div>
+    </div>
+</div>
+</body>
+</html>

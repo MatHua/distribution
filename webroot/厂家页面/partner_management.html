@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link href="css/style.css" rel="stylesheet">
+    <script src="js/jquery-1.11.0.min.js"></script>
+</head>
+<body>
+<div id="Partnerarea">
+    <div id="Mask" style="width: 100%; height: 100% ;cursor: default;display: none;position: absolute;"></div>
+    <div class="Addbox">
+        <div class="Inputbox">
+            <div>
+                <label for="fx_id">分销商ID：</label><input type="text" id="fx_id"/>
+                <label for="fx_name">分销商姓名：</label><input type="text" id="fx_name"/>
+            </div>
+            <div>
+                <label for="fx_dw">分销商单位：</label><input type="text" id="fx_dw"/>
+            </div>
+            <div>
+                <label for="fx_szd">所在地：</label><input type="text" id="fx_szd"/>
+            </div>
+            <div>
+                <label for="fx_phone">联系电话：</label><input type="text" id="fx_phone"/>
+            </div>
+            <div>
+                <label for="fx_acount">交易账户：</label><input type="text" id="fx_acount"/>
+            </div>
+        </div>
+        <div class="Addbtn">
+          <div>
+            <a id="Add_save">保存</a>
+            <a id="Add_cance">取消</a>
+          </div>
+        </div>
+    </div>
+    <!--页面头部选项-->
+   <div class="Partner_header">
+       <a id="Partner_xx" class="Partner_click">分销商信息表</a>
+       <span></span>
+       <a id="Partner_yj">分销商业绩表</a>
+   </div>
+    <!--功能主体-->
+    <!--分销商信息表-->
+    <div class="Partner_xx clearfix">
+        <!--左侧页面-->
+       <div class="Partner_left">
+           <div id="xx_title" class="xx_title">
+               <a>分销商ID</a>
+               <a>分销商姓名</a>
+               <a>分销商单位</a>
+               <a>所在地</a>
+               <a>联系方式</a>
+               <a>交易账户</a>
+           </div>
+           <div id="xx_list">
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+               <div class="row">
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+                   <div class="cell"></div>
+               </div>
+           </div>
+       </div>
+        <!--右侧页面-->
+       <div class="Partner_right">
+           <div id="Partner_oprate">
+               <a id="xz">新增</a>
+               <a id="zp">指派</a>
+               <a id="sc">删除</a>
+               <a id="qx">全选</a>
+           </div>
+           <div class="Partner_box">
+               <div class="Partner_messtxt">
+                   <h2>分销商信息</h2>
+               </div>
+               <div class="Partner_mess">
+                  <label for="xx_name">姓名：</label><input type="text" id="xx_name" disabled="disabled"/>
+               </div>
+               <div class="Partner_mess">
+                   <label for="xx_dw">单位：</label><textarea style="resize: none;" id="xx_dw" disabled="disabled"></textarea>
+               </div>
+               <div class="Partner_mess">
+                   <label for="xx_szd">所在地：</label><textarea style="resize: none;" id="xx_szd" disabled="disabled"></textarea>
+               </div>
+               <div class="Partner_mess">
+                   <label for="xx_lx">联系电话：</label><textarea type="text" id="xx_lx" disabled="disabled"/></textarea>
+               </div>
+               <div class="Partner_mess">
+                   <label for="xx_zh">账户：</label><textarea style="resize: none;"  id="xx_zh" disabled="disabled"></textarea>
+               </div>
+               <div class="Partner_mess">
+                   <label for="xx_lx">创建于：</label><textarea style="resize: none;" type="text" id="xx_sj" disabled="disabled"/></textarea>
+               </div>
+           </div>
+       </div>
+       <div id="List_pages">
+            <div class="pagenum">
+            </div>
+        </div>
+    </div>
+    <!--分销商业绩表-->
+    <div class="Partner_yj clearfix">
+        <div class="yj_test">业绩统计</div>
+        <div id="day_yj"></div>
+        <div id="month_yj"></div>
+        <div class="day_top"><h3>各个分销商的销售情况</h3></div>
+        <div class="toptable">
+            <div id="day_1-5" class="rank">
+                <div class="th">
+                    <div>姓名</div>
+                    <div>营业额</div>
+                    <div>利润</div>
+                </div>
+                <div class="tr">
+                    <div class="td">吴丹武</div>
+                    <div class="td">500件</div>
+                    <div class="td">50000元</div>
+                </div>
+                <div class="tr">
+                    <div class="td"></div>
+                    <div class="td"></div>
+                    <div class="td"></div>
+                </div>
+                <div class="tr">
+                    <div class="td"></div>
+                    <div class="td"></div>
+                    <div class="td"></div>
+                </div>
+                <div class="tr">
+                    <div class="td"></div>
+                    <div class="td"></div>
+                    <div class="td"></div>
+                </div>
+                <div class="tr">
+                    <div class="td"></div>
+                    <div class="td"></div>
+                    <div class="td"></div>
+                </div>
+            </div>
+            <div id="day_6-10" class="rank">
+                <div class="th">
+                    <div>排行</div>
+                    <div>姓名</div>
+                    <div>营业额</div>
+                </div>
+                <div class="tr">
+                    <div class="td"></div>
+                    <div class="td"></div>
+                    <div class="td"></div>
+                </div>
+                <div class="tr">
+                    <div class="td"></div>
+                    <div class="td"></div>
+                    <div class="td"></div>
+                </div>
+                <div class="tr">
+                    <div class="td"></div>
+                    <div class="td"></div>
+                    <div class="td"></div>
+                </div>
+                <div class="tr">
+                    <div class="td"></div>
+                    <div class="td"></div>
+                    <div class="td"></div>
+                </div>
+                <div class="tr">
+                    <div class="td"></div>
+                    <div class="td"></div>
+                    <div class="td"></div>
+                </div>
+            </div>
+        </div>
+        <div class="page_list">
+            <a>《</a><a class="cur">1</a><a>2</a><a>3</a><span>...</span><a>10</a><a>》</a>
+        </div>
+        <div class="day_top"><h3>本日业绩排行榜</h3></div>
+        <div class="toptable">
+        <div id="day_1-5" class="rank">
+            <div class="th">
+                <div>排行</div>
+                <div>姓名</div>
+                <div>营业额</div>
+            </div>
+            <div class="tr">
+                <div class="td">1</div>
+                <div class="td">吴丹武</div>
+                <div class="td">500件</div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+        </div>
+        <div id="day_6-10" class="rank">
+            <div class="th">
+                <div>排行</div>
+                <div>姓名</div>
+                <div>营业额</div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+        </div>
+            </div>
+        <div class="page_list">
+            <a>《</a><a class="cur">1</a><a>2</a><a>3</a><span>...</span><a>10</a><a>》</a>
+        </div>
+        <div class="week_top"><h3>本周业绩排行榜</h3></div>
+        <div class="toptable">
+        <div id="week_1-5" class="rank">
+            <div class="th">
+                <div>排行</div>
+                <div>姓名</div>
+                <div>营业额</div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+        </div>
+        <div id="week_6-10" class="rank">
+            <div class="th">
+                <div>排行</div>
+                <div>姓名</div>
+                <div>营业额</div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+        </div>
+        </div>
+        <div class="page_list">
+            <a>《</a><a class="cur">1</a><a>2</a><a>3</a><span>...</span><a>10</a><a>》</a>
+        </div>
+        <div class="month_top"><h3>本月业绩排行榜</h3></div>
+        <div class="toptable">
+        <div id="month_1-5" class="rank">
+            <div class="th">
+                <div>排行</div>
+                <div>姓名</div>
+                <div>营业额</div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+        </div>
+        <div id="month_6-10" class="rank">
+            <div class="th">
+                <div>排行</div>
+                <div>姓名</div>
+                <div>营业额</div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+            <div class="tr">
+                <div class="td"></div>
+                <div class="td"></div>
+                <div class="td"></div>
+            </div>
+        </div>
+            <div class="page_list">
+                <a>《</a><a class="cur">1</a><a>2</a><a>3</a><span>...</span><a>10</a><a>》</a>
+            </div>
+        </div>
+    </div>
+    </div>
+</body>
+</html>

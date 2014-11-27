@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link href="css/style.css" rel="stylesheet">
+    <script src="js/jquery-1.11.0.min.js"></script>
+</head>
+<body>
+<div id="Container" class="Container">
+    <div id="Header">
+        <div class="logo">聚分销</div>
+        <a id="back" class="back">返回首页</a>
+        <a id="exit" class="exit">退出系统</a>
+    </div>
+    <div id="Menu">
+        <a id="Goods_Management" name="Listarea">商品管理</a>
+        <a id="Partner_Management" name="Partnerarea">分销商管理</a>
+        <a id="Order_Detail" name="Orderarea">订单详情</a>
+        <a id="Sales_Report" name="Reportarea">销售报表</a>
+        <a id="Count_Management" name="Countarea">账号管理</a>
+    </div>
+    <div id="Listarea">
+        <div id="List_Operate">
+            <div class="operate">
+                <input type="checkbox" name="sp" id="CheckAll" onclick="checkAll(this,this.name)"/><a id="Allselect">全选</a><a id="Delect_goods">删除</a>
+            </div>
+            <div class="search">
+                <input type="text" placeholder="请输入关键词" value="" autocomplete="off" id="searchkey"/><div id="go">搜索<span></span></div>
+            </div>
+            <div class="sort">
+                <a id="sort_cb" data-status="up" name="cost_price">成本价<span></span></a>
+                <a id="sort_fx" data-status="up" name="distributor_price">分销价<span></span></a>
+                <a id="sort_ls" data-status="up" name="salesman_price">零售价<span></span></a>
+                <a id="sort_lb" data-status="up" name="has_sale">销量<span></span></a>
+                <a id="sort_sj" data-status="up" name="cTime">上架时间<span></span></a>
+            </div>
+        </div>
+        <div class="Partner_header">
+            <a id="Partner_xx" class="Partner_click">上架的商品</a>
+            <span></span>
+            <a id="Partner_yj">下架的商品</a>
+        </div>
+        <div id="List_goodsarea" class="clearfix">
+            <!-详细商品-->
+        </div>
+        <div id="List_sc_goodsarea" class="clearfix">
+            <div class="Goodsbox clearfix">
+                <div class="checkbox"><input type="checkbox" name="sp" onclick="checkItem(this, this.name)" value="3">
+                </div>
+                <div class="boxborder">
+                    <div class="goods_status">
+                        <a>已上架</a>
+                    </div>
+                    <div class="Goods_img"><img src="images/546771f1b9e2e.png"><span>销量：10</span></div>
+                    <div class="Goods_detail">
+                        <div class="row"><label>商品名：</label><input id="good_name_0" type="text" value="商品3"
+                                                                   disabled="disabled"><label>商品ID：</label><input name="id"
+                                id="good_id_0" type="text" value="3" disabled="disabled"></div>
+                        <div class="row"><label>成本价：￥</label><input id="goods_cb_0" type="text" value="10"
+                                                                    disabled="disabled"><label>分销价：￥</label><input
+                                id="goods_fx_0" type="text" value="12" disabled="disabled"><label>零售价：￥</label><input
+                                id="goods_ls_0" type="text" value="20" disabled="disabled"><label>库存：</label><input
+                                id="goods_kc_0" type="text" value="0" disabled="disabled"></div>
+                    </div>
+                    <div class="Goods_oprate"><a id="good-detailchange">下架</a><a id="good-change">详情</a></div>
+                </div>
+            </div>
+            <div class="Goodsbox clearfix">
+                <div class="checkbox"><input type="checkbox" name="sp" onclick="checkItem(this, this.name)" value="4">
+                </div>
+                <div class="boxborder">
+                    <div class="goods_status">
+                        <a>已上架</a>
+                    </div>
+                    <div class="Goods_img"><img src="images/42422223.png"><span>销量：10</span></div>
+                    <div class="Goods_detail">
+                        <div class="row"><label>商品名：</label><input id="good_name_1" type="text" value="商品3"
+                                                                   disabled="disabled"><label>商品ID：</label><input name="id"
+                                id="good_id_1" type="text" value="4" disabled="disabled"></div>
+                        <div class="row"><label>成本价：￥</label><input id="goods_cb_1" type="text" value="10"
+                                                                    disabled="disabled"><label>分销价：￥</label><input
+                                id="goods_fx_1" type="text" value="12" disabled="disabled"><label>零售价：￥</label><input
+                                id="goods_ls_1" type="text" value="20" disabled="disabled"><label>库存：</label><input
+                                id="goods_kc_1" type="text" value="0" disabled="disabled"></div>
+                    </div>
+                    <div class="Goods_oprate"><a id="good-detailchange">下架</a><a id="good-change">详情</a></div>
+                </div>
+            </div>
+            <div class="Goodsbox clearfix">
+                <div class="checkbox"><input type="checkbox" name="sp" onclick="checkItem(this, this.name)" value="5">
+                </div>
+                <div class="boxborder">
+                    <div class="goods_status">
+                        <a>已上架</a>
+                    </div>
+                    <div class="Goods_img"><img src="images/43245532.png"><span>销量：10</span></div>
+                    <div class="Goods_detail">
+                        <div class="row"><label>商品名：</label><input id="good_name_2" type="text" value="商品3"
+                                                                   disabled="disabled"><label>商品ID：</label><input name="id"
+                                id="good_id_2" type="text" value="5" disabled="disabled"></div>
+                        <div class="row"><label>成本价：￥</label><input id="goods_cb_2" type="text" value="10"
+                                                                    disabled="disabled"><label>分销价：￥</label><input
+                                id="goods_fx_2" type="text" value="12" disabled="disabled"><label>零售价：￥</label><input
+                                id="goods_ls_2" type="text" value="20" disabled="disabled"><label>库存：</label><input
+                                id="goods_kc_2" type="text" value="0" disabled="disabled"></div>
+                    </div>
+                    <div class="Goods_oprate"><a id="good-detailchange">下架</a><a id="good-change">详情</a></div>
+                </div>
+            </div>
+            <div class="Goodsbox clearfix">
+                <div class="checkbox"><input type="checkbox" name="sp" onclick="checkItem(this, this.name)" value="6">
+                </div>
+                <div class="boxborder">
+                    <div class="goods_status">
+                        <a>已上架</a>
+                    </div>
+                    <div class="Goods_img"><img src="images/43245532.png"><span>销量：10</span></div>
+                    <div class="Goods_detail">
+                        <div class="row"><label>商品名：</label><input id="good_name_3" type="text" value="商品3"
+                                                                   disabled="disabled"><label>商品ID：</label><input name="id"
+                                id="good_id_3" type="text" value="6" disabled="disabled"></div>
+                        <div class="row"><label>成本价：￥</label><input id="goods_cb_3" type="text" value="10"
+                                                                    disabled="disabled"><label>分销价：￥</label><input
+                                id="goods_fx_3" type="text" value="12" disabled="disabled"><label>零售价：￥</label><input
+                                id="goods_ls_3" type="text" value="20" disabled="disabled"><label>库存：</label><input
+                                id="goods_kc_3" type="text" value="0" disabled="disabled"></div>
+                    </div>
+                    <div class="Goods_oprate"><a id="good-detailchange">下架</a><a id="good-change">详情</a></div>
+                </div>
+            </div>
+            <div class="Goodsbox clearfix">
+                <div class="checkbox"><input type="checkbox" name="sp" onclick="checkItem(this, this.name)" value="7">
+                </div>
+                <div class="boxborder">
+                    <div class="goods_status">
+                        <a>已上架</a>
+                    </div>
+                    <div class="Goods_img"><img src="images/546771f1b9e2e.png"><span>销量：10</span></div>
+                    <div class="Goods_detail">
+                        <div class="row"><label>商品名：</label><input id="good_name_4" type="text" value="商品3"
+                                                                   disabled="disabled"><label>商品ID：</label><input name="id"
+                                id="good_id_4" type="text" value="7" disabled="disabled"></div>
+                        <div class="row"><label>成本价：￥</label><input id="goods_cb_4" type="text" value="10"
+                                                                    disabled="disabled"><label>分销价：￥</label><input
+                                id="goods_fx_4" type="text" value="12" disabled="disabled"><label>零售价：￥</label><input
+                                id="goods_ls_4" type="text" value="20" disabled="disabled"><label>库存：</label><input
+                                id="goods_kc_4" type="text" value="0" disabled="disabled"></div>
+                    </div>
+                    <div class="Goods_oprate"><a id="good-detailchange">下架</a><a id="good-change">详情</a></div>
+                </div>
+            </div>
+            <div class="Goodsbox clearfix">
+                <div class="checkbox"><input type="checkbox" name="sp" onclick="checkItem(this, this.name)" value="8">
+                </div>
+                <div class="boxborder">
+                    <div class="goods_status">
+                        <a>已上架</a>
+                    </div>
+                    <div class="Goods_img"><img src="images/546771f1b9e2e.png"><span>销量：10</span></div>
+                    <div class="Goods_detail">
+                        <div class="row"><label>商品名：</label><input id="good_name_5" type="text" value="商品4"
+                                                                   disabled="disabled"><label>商品ID：</label><input name="id"
+                                id="good_id_5" type="text" value="8" disabled="disabled"></div>
+                        <div class="row"><label>成本价：￥</label><input id="goods_cb_5" type="text" value="10"
+                                                                    disabled="disabled"><label>分销价：￥</label><input
+                                id="goods_fx_5" type="text" value="12" disabled="disabled"><label>零售价：￥</label><input
+                                id="goods_ls_5" type="text" value="20" disabled="disabled"><label>库存：</label><input
+                                id="goods_kc_5" type="text" value="0" disabled="disabled"></div>
+                    </div>
+                    <div class="Goods_oprate"><a id="good-detailchange">下架</a><a id="good-change">详情</a></div>
+                </div>
+            </div>
+        </div>
+        <div id="List_pages">
+            <div class="pagenum">
+            </div>
+        </div>
+    </div>
+    <div id="Footer">
+        <div class="footer">
+            <a>关于聚分销</a>
+            <a>帮助中心</a>
+            <a>诚聘英才</a>
+            <a>网站合作</a>
+            <a>版权声明</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

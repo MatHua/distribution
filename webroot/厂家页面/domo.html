@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="js/jquery-1.11.0.min.js"></script>
+</head>
+<body>
+  <div>
+
+  </div>
+</body>
+<script>
+ $(document).ready(function() {
+       var url = "http://localhost/bowen/bowen/index.php/Factory/getProductDetail";
+       // $.post("http://localhost/distribution-master/index.php/Factory/getAllProduct",{},function(data){alert(data);});
+        $.ajax(url, {
+            data: {
+                "id":"1"
+           },
+            type:"GET",
+            dataType: 'json',
+            crossDomain: true,
+            success: function (data) {
+                   console.log(data);
+               }
+            })
+        })
+/*$(function($) {
+     var url = 'http://localhost/distribution-master/index.php/Factory/getAllProduct';
+     $.ajax(url, {
+         data: {
+         },
+         dataType: 'json',
+         crossDomain: true,
+         success: function (data) {
+                 console.log(data);
+             }
+         }
+     });
+})*/
+//$(function($) {
+//    var url = 'http://v.juhe.cn/weather/index';
+//    $.ajax(url, {
+//        data: {
+//            'cityname': '襄阳',
+//            'dtype': 'jsonp',
+//            'key': 'xxxx',
+//            '_': new Date().getTime()
+//        },
+//        dataType: 'jsonp',
+//        crossDomain: true,
+//        success: function (data) {
+//            if (data && data.resultcode == '200') {
+//                console.log(data.result.today);
+//            }
+//        }
+//    });
+//})
+</script>
+</html>
